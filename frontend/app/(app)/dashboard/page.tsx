@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from "react"
 import axios from "axios"
 import { useRouter } from "next/navigation"
+import { getApiUrl } from "@/lib/api"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Package, Network, TriangleAlert } from "lucide-react"
@@ -53,7 +54,7 @@ export default function DashboardPage() {
         const fetchProblems = async () => {
             const token = localStorage.getItem('access_token');
             try {
-                const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5001";
+                const apiUrl = getApiUrl();
                 const response = await axios.get(`${apiUrl}/api/problems`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });

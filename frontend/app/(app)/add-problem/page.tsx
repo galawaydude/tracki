@@ -4,6 +4,7 @@ import type React from "react"
 import { useState, useRef, useEffect } from "react"
 import axios from "axios"
 import { useRouter } from "next/navigation"
+import { getApiUrl } from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -259,14 +260,14 @@ export default function AddProblemPage() {
     const [notes, setNotes] = useState("")
     const [tags, setTags] = useState<string[]>([])
     
-    const [existingTags, setExistingTags] = useState<string[]>([]);
-    const [existingPlatforms, setExistingPlatforms] = useState<string[]>([]);
-    const [existingDifficulties, setExistingDifficulties] = useState<string[]>([]);
+    const [existingTags, setExistingTags] = useState<string[]>([])
+    const [existingPlatforms, setExistingPlatforms] = useState<string[]>([])
+    const [existingDifficulties, setExistingDifficulties] = useState<string[]>([])
 
-    const [error, setError] = useState("")
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState<string | null>(null)
     const [success, setSuccess] = useState("")
-    const [loading, setLoading] = useState(false);
-    
+
     const difficultyColorClass = getDifficultyColor(difficulty);
 
     useEffect(() => {
@@ -274,64 +275,65 @@ export default function AddProblemPage() {
             const token = localStorage.getItem('access_token');
             // The global layout will handle redirection if the token is missing.
             try {
-                const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5001";
+                const apiUrl = getApiUrl();
                 const response = await axios.get(`${apiUrl}/api/${endpoint}`, {
                     headers: { Authorization: `Bearer ${token}` },
-                });
-                setter(response.data);
-            } catch (err) {
-                console.error(`Failed to fetch ${endpoint}`, err);
+                })
+                setter(response.data)
+            } catch (error) {
+                console.error(`Error fetching ${endpoint}:`, error)
             }
-        };
+        }
 
-        fetchData("tags", setExistingTags);
-        fetchData("platforms", setExistingPlatforms);
-        fetchData("difficulties", setExistingDifficulties);
-    }, []);
+        fetchData("platforms", setExistingPlatforms)
+        fetchData("difficulties", setExistingDifficulties)
+        fetchData("tags", setExistingTags)
+    }, [router])
 
     const handleDifficultyBlur = () => {
-        const num = parseInt(difficulty, 10);
-        if (!isNaN(num) && String(num) === difficulty) {
-            const formatted = Math.floor(num / 100) * 100 + "+";
-            setDifficulty(formatted);
+        const found = existingDifficulties.find(d => d.toLowerCase().startsWith(difficulty.toLowerCase()));
+        if (found && difficulty.length > 2) {
+            setDifficulty(found);
         }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        setLoading(true);
-        setError("")
+        setLoading(true)
+        setError(null)
         setSuccess("")
+        const token = localStorage.getItem("token")
 
-        const token = localStorage.getItem('access_token');
-        // The global layout will handle redirection if the token is missing.
+        if (!token) {
+            setError("Authentication error. Please log in again.")
+            setLoading(false)
+            return
+        }
 
         const problemData = {
             title,
             url,
             platform,
             difficulty,
+            tags,
             logic,
             notes,
-            tags,
-        };
+        }
 
         try {
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5001";
+            const apiUrl = getApiUrl()
             await axios.post(`${apiUrl}/api/problems`, problemData, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setSuccess("Problem added successfully! Redirecting...");
-            setTimeout(() => {
-                router.push('/problems');
-            }, 1000);
+                headers: { Authorization: `Bearer ${token}` },
+            })
+            setSuccess("Problem added successfully! Redirecting...")
+            router.push("/problems")
         } catch (err: any) {
-            const errorMessage = err.response?.data?.msg || "Failed to add problem.";
-            setError(errorMessage);
+            setError(err.response?.data?.msg || "An unexpected error occurred.")
+            console.error(err)
         } finally {
-            setLoading(false);
+            setLoading(false)
         }
-    };
+    }
     
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">

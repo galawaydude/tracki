@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { getApiUrl } from "@/lib/api";
 import { User, Link, PlusCircle, Trash2 } from 'lucide-react';
 
 interface Profile {
@@ -30,7 +31,7 @@ export default function ProfileCard() {
       if (!token) return;
 
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5001";
+        const apiUrl = getApiUrl();
         const res = await fetch(`${apiUrl}/api/profile`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -51,7 +52,7 @@ export default function ProfileCard() {
     if (!token) return;
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5001";
+      const apiUrl = getApiUrl();
       const res = await fetch(`${apiUrl}/api/profile`, {
         method: 'POST',
         headers: {

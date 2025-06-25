@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import axios from "axios"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import { getApiUrl } from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -93,7 +94,7 @@ export default function ProblemListPage() {
     const fetchProblems = async () => {
       const token = localStorage.getItem('access_token');
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5001";
+        const apiUrl = getApiUrl();
         const response = await axios.get(`${apiUrl}/api/problems`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -157,7 +158,7 @@ export default function ProblemListPage() {
   const handleExport = async () => {
     const token = localStorage.getItem('access_token');
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5001";
+      const apiUrl = getApiUrl();
       const response = await axios.get(`${apiUrl}/api/problems/export`, {
         headers: { Authorization: `Bearer ${token}` },
         responseType: 'blob', // Important
@@ -183,7 +184,7 @@ export default function ProblemListPage() {
     
     const token = localStorage.getItem('access_token');
     try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5001";
+        const apiUrl = getApiUrl();
         await axios.put(`${apiUrl}/api/problems/${problemId}/toggle_revisit`, {}, {
             headers: { Authorization: `Bearer ${token}` }
         });
@@ -198,7 +199,7 @@ export default function ProblemListPage() {
   const handleDelete = async (problemId: number) => {
     const token = localStorage.getItem('access_token');
     try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5001";
+        const apiUrl = getApiUrl();
         await axios.delete(`${apiUrl}/api/problems/${problemId}`, {
             headers: { Authorization: `Bearer ${token}` }
         });
@@ -220,7 +221,7 @@ export default function ProblemListPage() {
     if (!currentProblem) return;
     const token = localStorage.getItem('access_token');
     try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5001";
+        const apiUrl = getApiUrl();
         const response = await axios.put(`${apiUrl}/api/problems/${currentProblem.id}`, 
             { logic: editLogic, notes: editNotes },
             { headers: { Authorization: `Bearer ${token}` } }

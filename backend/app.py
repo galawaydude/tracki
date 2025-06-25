@@ -336,5 +336,10 @@ def handle_profile():
 def hello_world():
     return {'message': 'Hello from Flask!'}
 
+@app.route('/api/status')
+def status():
+    """A simple endpoint to check if the backend is running."""
+    return jsonify({"status": "ok", "message": "Backend is running!"})
+
 if __name__ == '__main__':
     app.run(debug=True, port=5001) 

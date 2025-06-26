@@ -163,7 +163,7 @@ export default function AddProblemPage() {
     const [loading, setLoading] = useState(false)
     
     useEffect(() => {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('access_token');
         if (!token) {
             router.push('/login');
             return;
@@ -194,7 +194,7 @@ export default function AddProblemPage() {
         setLoading(true);
         setError("");
 
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('access_token');
         if (!token) {
             setError("Authentication error. Please log in again.");
             setLoading(false);

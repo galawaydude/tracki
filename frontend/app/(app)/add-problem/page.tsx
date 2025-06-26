@@ -273,22 +273,29 @@ export default function AddProblemPage() {
     useEffect(() => {
         const fetchData = async (endpoint: string, setter: (data: string[]) => void) => {
             const token = localStorage.getItem('access_token');
-            // The global layout will handle redirection if the token is missing.
+            if (!token) {
+                // This check is important. If no token, no need to fetch.
+                // The main layout should handle the redirect.
+                return;
+            }
             try {
                 const apiUrl = getApiUrl();
                 const response = await axios.get(`${apiUrl}/api/${endpoint}`, {
                     headers: { Authorization: `Bearer ${token}` },
-                })
-                setter(response.data)
-            } catch (error) {
-                console.error(`Error fetching ${endpoint}:`, error)
+                });
+                setter(response.data);
+            } catch (err) {
+                console.error(`Failed to fetch ${endpoint}`, err);
+                 if ((err as any).response?.status === 401) {
+                    router.push('/login');
+                }
             }
-        }
+        };
 
-        fetchData("platforms", setExistingPlatforms)
-        fetchData("difficulties", setExistingDifficulties)
-        fetchData("tags", setExistingTags)
-    }, [router])
+        fetchData("tags", setExistingTags);
+        fetchData("platforms", setExistingPlatforms);
+        fetchData("difficulties", setExistingDifficulties);
+    }, [router]);
 
     const handleDifficultyBlur = () => {
         const found = existingDifficulties.find(d => d.toLowerCase().startsWith(difficulty.toLowerCase()));
@@ -300,10 +307,10 @@ export default function AddProblemPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setLoading(true)
-        setError(null)
+        setError("")
         setSuccess("")
-        const token = localStorage.getItem("token")
 
+        const token = localStorage.getItem('access_token');
         if (!token) {
             setError("Authentication error. Please log in again.")
             setLoading(false)

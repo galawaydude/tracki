@@ -4,6 +4,6 @@ This is an application, that i personally use. I needed something to help me tra
 
 Made the backend using flask, and the frontend is in react.
 
-**was hosted on azure, but azure postgres was costing too much, had to take it down, can be run locally**
+**was hosted on azure, but azure postgres was costing too much, had to take it down, can be run locally, just run the start.sh file**
 
 
